@@ -1,1 +1,3 @@
 # cli
+
+Boring CI
