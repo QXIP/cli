@@ -26,6 +26,7 @@ sslverify=1
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 metadata_expire=300
 EOF
+yum install -y sudo curl
 echo -e "Please insert the provided key to install hep_cli:"
 read key
         sed -i "s/0000-0000-0000-rpm/$key/g" /etc/yum.repos.d/qxip_hepic-dev.repo
@@ -33,10 +34,10 @@ read key
 echo -e "************************************************************"
 echo -e "\t ${GREEN} Installing Hepic-Installer a.k.a hep_cli ${NC}\n\t\t"
 echo -e "************************************************************"
-yum install hepic-installer -y
+yum install -y hepic-installer
 
 elif [ -n "$(command -v apt-get)" ];then
-apt-get install gnupg curl
+apt-get install -y sudo gnupg curl
 sudo install -m 0755 -d /etc/apt/keyrings
 echo -e "Please insert the provided key to install hep_cli:"
 read key
@@ -54,7 +55,7 @@ echo "done."
 echo -e "************************************************************"
 echo -e "\t ${GREEN} Installing Hepic-Installer a.k.a hep_cli ${NC}\n\t\t"
 echo -e "************************************************************"
-apt-get install hepic-installer -y
+apt-get install -y hepic-installer
 
 fi
 
