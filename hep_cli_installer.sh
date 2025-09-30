@@ -45,8 +45,9 @@ EOF
 
 echo -e "Please insert the provided key to install hep_cli:"
 read key
-        curl -L https://$key:@packagecloud.io/qxip/hepic/gpgkey | apt-key add -
-        sed -i "s/0000-0000-0000-deb/$key/g" /etc/apt/sources.list.d/qxip_hepic.list
+         curl -fsSL https://$key:@packagecloud.io/qxip/hepic/gpgkey | gpg --dearmor -o /usr/share/keyrings/qxip-hepic.gpg
+         sed -i "s|0000-0000-0000-deb|$key|g" /etc/apt/sources.list.d/qxip_hepic.list
+
 
   echo -n "Running apt-get update... "
   apt-get update &> /dev/null
