@@ -2,6 +2,7 @@
 GREEN='\033[0;32m'
 NC='\033[0m'
 if [ -n "$(command -v yum)" ];then
+yum install -y sudo curl
 echo
 cat > /etc/yum.repos.d/qxip_hepic.repo << 'EOF'
 [qxip_hepic]
@@ -26,7 +27,6 @@ sslverify=1
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 metadata_expire=300
 EOF
-yum install -y sudo curl
 echo -e "Please insert the provided key to install hep_cli:"
 read key
         sed -i "s/0000-0000-0000-rpm/$key/g" /etc/yum.repos.d/qxip_hepic.repo
