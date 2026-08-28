@@ -38,19 +38,18 @@ yum install -y hepic-installer
 
 elif [ -n "$(command -v apt-get)" ];then
 apt-get install -y sudo gnupg curl
-cat > /etc/apt/sources.list.d/qxip_hepic.list << 'EOF'
-deb https://0000-0000-0000-deb:@packagecloud.io/qxip/hepic/any/ any main
-deb-src https://0000-0000-0000-deb:@packagecloud.io/qxip/hepic/any/ any main
-EOF
-
+sudo install -m 0755 -d /etc/apt/keyrings
 echo -e "Please insert the provided key to install hep_cli:"
 read key
-        curl -L https://$key:@packagecloud.io/qxip/hepic/gpgkey | apt-key add -
-        sed -i "s/0000-0000-0000-deb/$key/g" /etc/apt/sources.list.d/qxip_hepic.list
-
-  echo -n "Running apt-get update... "
-  apt-get update &> /dev/null
-  echo "done."
+curl -fsSL "https://${key}:@packagecloud.io/qxip/hepic/gpgkey" | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/hepic.gpg
+cat > /etc/apt/sources.list.d/qxip_hepic.list << 'EOF'
+deb [signed-by=/etc/apt/keyrings/hepic.gpg] https://0000-0000-0000-deb:@packagecloud.io/qxip/hepic/any/ any main
+deb-src [signed-by=/etc/apt/keyrings/hepic.gpg] https://0000-0000-0000-deb:@packagecloud.io/qxip/hepic/any/ any main
+EOF
+sed -i "s/0000-0000-0000-deb/$key/g" /etc/apt/sources.list.d/qxip_hepic.list
+echo -n "Running apt-get update... "
+apt-get update &> /dev/null
+echo "done."
 
 
 echo -e "************************************************************"
