@@ -44,14 +44,24 @@ else
     fail "Unsupported OS: neither /etc/redhat-release nor /etc/debian_version exists."
 fi
 
-echo -e "Please insert the provided key to install hep_cli:"
-read -r key
+## The key can be passed in HEP_CLI_KEY; otherwise prompt for it. When stdin is not a
+## terminal (e.g. "curl ... | bash", where stdin is the script itself) ask on /dev/tty.
+key="${HEP_CLI_KEY:-}"
+if [ -z "$key" ]; then
+    echo -e "Please insert the provided key to install hep_cli:"
+    if [ ! -t 0 ] && { : < /dev/tty; } 2> /dev/null; then
+        read -r key < /dev/tty
+    else
+        read -r key
+    fi
+fi
 key="$(printf '%s' "$key" | tr -d '[:space:]')"
 if [ -z "$key" ]; then
     fail "No key was entered."
 fi
+## Only characters that are safe in the repo URL and in the files written below
 case "$key" in
-    *[!A-Za-z0-9]*) fail "The key may contain only letters and digits. Check that it was copied correctly." ;;
+    *[!A-Za-z0-9_-]*) fail "The key may contain only letters, digits, '-' and '_'. Check that it was copied correctly." ;;
 esac
 
 ## Remove the repo files written by older versions of this script
@@ -68,7 +78,9 @@ remove_legacy() {
 if [ "$FAMILY" == rhel ]; then
     remove_legacy /etc/yum.repos.d/qxip_hepic.repo
 
-    "$PKG" install -y sudo curl || fail "Could not install sudo and curl."
+    # curl is not needed here: dnf/yum fetch the repo themselves. Installing it would
+    # also conflict with curl-minimal on RHEL/Rocky 9 images.
+    "$PKG" install -y sudo || fail "Could not install sudo."
 
     cat > "$YUM_REPO" << EOF
 [qxip_hepic_rpm_any]
