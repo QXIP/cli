@@ -129,7 +129,12 @@ EOF
     echo -e "************************************************************"
     echo -e "\t ${GREEN} Installing Hepic-Installer a.k.a hep_cli ${NC}\n\t\t"
     echo -e "************************************************************"
-    apt-get install -y hepic-installer || fail "hepic-installer could not be installed. Check the apt-get update output above."
+    # hepic-installer ships /bin/hep_cli as a conffile. dpkg does not put back a conffile
+    # that was deleted while the package was removed but not purged, so a plain install
+    # can leave the host without hep_cli. --reinstall also covers a package that is still
+    # installed, and --force-confmiss re-creates the missing file.
+    apt-get install -y --reinstall -o Dpkg::Options::=--force-confmiss hepic-installer \
+        || fail "hepic-installer could not be installed. Check the apt-get update output above."
 fi
 
 command -v hep_cli > /dev/null || fail "hepic-installer was installed but hep_cli was not found."
